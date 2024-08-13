@@ -1,0 +1,65 @@
+From c27a53e7fc246a7ee785aa6909f9a41939d47b6d Mon Sep 17 00:00:00 2001
+From: Zhang Peng <peng.zhang1.cn@windriver.com>
+Date: Tue, 13 Aug 2024 03:31:36 +0000
+Subject: [PATCH 2/2] fix module TextBalloon is not installed
+
+```
+$ /usr/share/examples/quick/customitems/painteditem/painteditemexample
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is
+not UTF-8.
+Qt depends on a UTF-8 locale, but has failed to switch to one.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+qrc:/qt/qml/painteditem/textballoons.qml:5:1: module "TextBalloon" is not installed
+import TextBalloon
+^
+
+$ find /usr/share/examples/quick/customitems/painteditem
+/usr/share/examples/quick/customitems/painteditem
+/usr/share/examples/quick/customitems/painteditem/share
+/usr/share/examples/quick/customitems/painteditem/share/examples
+/usr/share/examples/quick/customitems/painteditem/share/examples/quick
+/usr/share/examples/quick/customitems/painteditem/share/examples/quick/customitems
+/usr/share/examples/quick/customitems/painteditem/share/examples/quick/customitems/painteditem
+/usr/share/examples/quick/customitems/painteditem/share/examples/quick/customitems/painteditem/TextBalloon
+/usr/share/examples/quick/customitems/painteditem/share/examples/quick/customitems/painteditem/TextBalloon/qmldir
+/usr/share/examples/quick/customitems/painteditem/share/examples/quick/customitems/painteditem/TextBalloon/libqmltextballoon.so
+/usr/share/examples/quick/customitems/painteditem/painteditemexample
+```
+
+The module TextBalloon incorrectly installed to /usr/share/examples/quick/customitems/painteditem/share/examples/
+quick/customitems/painteditem/TextBalloon, tweak INSTALL_EXAMPLEDIR according to the
+policy of OE cmake install
+```
+root@intel-x86-64:~# find
+/usr/share/examples/quick/customitems/painteditem
+/usr/share/examples/quick/customitems/painteditem
+/usr/share/examples/quick/customitems/painteditem/painteditemexample
+/usr/share/examples/quick/customitems/painteditem/TextBalloon
+/usr/share/examples/quick/customitems/painteditem/TextBalloon/libqmltextballoon.so
+/usr/share/examples/quick/customitems/painteditem/TextBalloon/qmldir
+```
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Zhang Peng <peng.zhang1.cn@windriver.com>
+---
+ .../quick/customitems/painteditem/TextBalloon/CMakeLists.txt    | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/examples/quick/customitems/painteditem/TextBalloon/CMakeLists.txt b/examples/quick/customitems/painteditem/TextBalloon/CMakeLists.txt
+index 6f3ed2f3..22598855 100644
+--- a/examples/quick/customitems/painteditem/TextBalloon/CMakeLists.txt
++++ b/examples/quick/customitems/painteditem/TextBalloon/CMakeLists.txt
+@@ -5,7 +5,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+     message(FATAL_ERROR "TextBalloon should be built as part of the 'painteditem' project, and not in isolation.")
+ endif()
+ 
+-set(INSTALL_EXAMPLEDIR "${INSTALL_EXAMPLESDIR}/quick/customitems/painteditem/TextBalloon")
++set(INSTALL_EXAMPLEDIR "${CMAKE_INSTALL_PREFIX}/TextBalloon")
+ 
+ qt_add_qml_module(qmltextballoon
+     URI "TextBalloon"
+-- 
+2.44.1
+
