@@ -12,5 +12,10 @@ inherit qt6-cmake
 include recipes-qt/qt6/qt6-git.inc
 include recipes-qt/qt6/qt6.inc
 
+SRC_URI += "\
+    file://CVE-2024-36048-0001.patch \
+    file://CVE-2024-36048-0002.patch \
+"
+
 DEPENDS += "qtbase"
 
